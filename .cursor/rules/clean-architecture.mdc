@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+All code should be written with respect to a clean architecture, separation of concerns, and loose coupling when possible.

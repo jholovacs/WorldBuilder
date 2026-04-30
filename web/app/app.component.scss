@@ -1,0 +1,36 @@
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--wb-shell-start) 0%, var(--wb-shell-end) 100%);
+}
+
+.top-bar {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--wb-border);
+  background: var(--wb-header-bg);
+  backdrop-filter: blur(8px);
+  color: var(--wb-text);
+}
+
+.brand {
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  font-size: 1.125rem;
+}
+
+.tag {
+  font-size: 0.8125rem;
+  color: var(--wb-text-muted);
+}
+
+.main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

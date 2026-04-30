@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>WorldBuilder.Gpu</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Direct3D.DXC" Version="1.8.2407.11" />
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
+    <ProjectReference Include="..\WorldBuilder.Domain\WorldBuilder.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Shaders\*.spv" />
+  </ItemGroup>
+
+</Project>

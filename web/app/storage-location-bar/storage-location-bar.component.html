@@ -1,0 +1,35 @@
+<section class="storage-bar" aria-label="World files location">
+  @if (!editing()) {
+    <div class="row">
+      @if (storage.rootPath(); as path) {
+        <span class="label">World files folder</span>
+        <code class="path" [title]="path">{{ path }}</code>
+        <button type="button" class="btn" (click)="startEdit()">Change</button>
+        <button type="button" class="btn ghost" (click)="clear()">Use API default</button>
+      } @else {
+        <span class="label warn">Choose where to save world files</span>
+        <span class="hint">
+          Enter an absolute path the API can write to (same machine as the API in local dev), e.g.
+          <code>D:\WorldBuilderData\worlds</code>
+        </span>
+        <button type="button" class="btn primary" (click)="startEdit()">Set folder…</button>
+      }
+    </div>
+  } @else {
+    <div class="row edit">
+      <label class="edit-label">
+        <span>Absolute path on the API machine</span>
+        <input
+          type="text"
+          [(ngModel)]="draftPath"
+          name="draftPath"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="e.g. D:\WorldBuilderData\worlds"
+        />
+      </label>
+      <button type="button" class="btn primary" (click)="save()">Save & remember</button>
+      <button type="button" class="btn" (click)="cancelEdit()">Cancel</button>
+    </div>
+  }
+</section>

@@ -1,0 +1,22 @@
+{
+  "id": "81f325ed-082c-468f-b9a9-0bfd7b9778aa",
+  "name": "Terra Nova",
+  "shape": "Sphere",
+  "seed": 3555193701446304785,
+  "totalSurfaceAreaSquareKilometers": 100,
+  "surfaceWaterCoveragePercent": 65,
+  "maxGroundElevationAboveSeaLevelMeters": 5000,
+  "minGroundDepthBelowSeaLevelMeters": 5000,
+  "medianGroundElevationAboveSeaLevelMeters": 850,
+  "groundResolutionSquareMeters": 1,
+  "estimatedSurfaceCellCount": 100000000,
+  "linearScaleVersusEarth": 0.00044277172164892037,
+  "referenceRadiusMeters": 2820.9479177387816,
+  "torusMajorRadiusMeters": null,
+  "torusMinorRadiusMeters": null,
+  "patchExtentXMeters": null,
+  "patchExtentZMeters": null,
+  "lastCompletedPhase": "BaseTopology",
+  "createdUtc": "2026-04-29T19:57:53.0272804+00:00",
+  "modifiedUtc": "2026-04-29T19:57:53.0272804+00:00"
+}

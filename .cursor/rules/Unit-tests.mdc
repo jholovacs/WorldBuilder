@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+Unit tests should always be documented with the system under test, the test case, the expected result, and why the test is important.

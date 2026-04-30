@@ -1,0 +1,122 @@
+<section class="panel">
+  @if (loadError(); as err) {
+    <p class="error" role="alert">{{ err }}</p>
+    <p><a routerLink="/worlds">← Worlds</a></p>
+  } @else {
+    @if (world(); as w) {
+      <p class="crumb"><a routerLink="/">Dashboard</a> / <a routerLink="/worlds">Worlds</a> / {{ w.name }}</p>
+      <h1>{{ w.name }}</h1>
+      <p class="meta">
+        Shape {{ w.shape }} · ~{{ w.totalSurfaceAreaSquareKilometers | number: '1.0-2' }} km² · ~{{
+          w.estimatedSurfaceCellCount | number
+        }}
+        cells · {{ w.groundResolutionSquareMeters }} m² per cell
+      </p>
+
+      <section class="terrain card">
+        <h2>Terrain generation</h2>
+        <ol class="steps">
+          <li>
+            <strong>Ocean baseline</strong> — flat seabed (featureless ocean). Writes <code>terrain/manifest.json</code>.
+          </li>
+          <li>
+            <strong>Generate terrain</strong> — iterative uplift from ocean floor until surface water coverage matches your
+            target (±2%). Saves <code>terrain/chunks/chunk-*.bin</code>.
+          </li>
+        </ol>
+
+        @if (manifest(); as m) {
+          <p class="phase">
+            Phase: <code>{{ m.phase }}</code>
+            @if (m.generation; as gen) {
+              <span class="muted">· generated {{ gen.generatedUtc | date: 'medium' }}</span>
+            }
+          </p>
+          @if (m.generation?.compliance; as c) {
+            <div class="compliance" [class.ok]="c.allParametersWithinTolerance">
+              <div class="grid">
+                <span>Water fraction</span>
+                <span>{{ c.actualWaterFraction | number: '1.4-4' }} (target {{ c.targetWaterFraction | number: '1.4-4' }})</span>
+                <span>Median land (m)</span>
+                <span>{{ c.actualMedianLandElevationMeters | number: '1.2-4' }}</span>
+                <span>Max elev (m)</span>
+                <span>{{ c.actualMaxElevationMeters | number: '1.2-4' }}</span>
+                <span>Max depth (m)</span>
+                <span>{{ c.actualMaxDepthBelowSeaMeters | number: '1.2-4' }}</span>
+                <span>Within tolerance</span>
+                <span>{{ c.allParametersWithinTolerance ? 'yes' : 'no' }}</span>
+              </div>
+            </div>
+          }
+        } @else {
+          <p class="muted">No terrain manifest yet.</p>
+        }
+
+        <label class="field">
+          <span>Chunk count (5–100)</span>
+          <input type="number" [(ngModel)]="chunkCount" min="5" max="100" step="1" />
+        </label>
+
+        <div class="actions">
+          <button type="button" class="secondary" [disabled]="busy()" (click)="oceanBaseline()">
+            {{ busy() === 'ocean' ? 'Working…' : 'Create ocean baseline' }}
+          </button>
+          <button type="button" class="primary" [disabled]="busy()" (click)="generateTerrain()">
+            {{ busy() === 'terrain' ? 'Generating…' : 'Generate terrain' }}
+          </button>
+          <a routerLink="/activity" class="activity-link">Live activity</a>
+        </div>
+
+        @if (liveTerrain(); as lt) {
+          <aside class="live-rail" role="status" aria-live="polite">
+            <div class="live-rail__row">
+              <span class="live-dot" [class.live-dot--ok]="hub.connectionState() === 'Connected'"></span>
+              <span class="live-meta">{{ hub.connectionState() }}</span>
+              <span [ngClass]="terrainPhaseClass(lt.phase)">{{ lt.phase }}</span>
+            </div>
+            @if (lt.progress01 != null) {
+              <div
+                class="live-meter"
+                role="progressbar"
+                [attr.aria-valuenow]="lt.progress01 * 100"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div class="live-meter__fill" [style.width.%]="lt.progress01 * 100"></div>
+              </div>
+            }
+            <p class="live-msg">{{ lt.message }}</p>
+            @if (lt.iteration != null || lt.actualWaterFraction != null) {
+              <p class="live-meta muted">
+                @if (lt.iteration != null) {
+                  <span>Iteration {{ lt.iteration }}</span>
+                }
+                @if (lt.actualWaterFraction != null && lt.targetWaterFraction != null) {
+                  <span>
+                    · water {{ lt.actualWaterFraction * 100 | number: '1.2-2' }}% → target
+                    {{ lt.targetWaterFraction * 100 | number: '1.2-2' }}%</span>
+                }
+              </p>
+            }
+          </aside>
+        }
+
+        @if (actionError(); as ae) {
+          <p class="error" role="alert">{{ ae }}</p>
+        }
+
+        @if (manifest(); as tm) {
+          @if (tm.phase === 'terrainGenerated' && tm.generation && worldId(); as vwId) {
+            <div class="preview-head">
+              <h2>Terrain preview</h2>
+              <p class="muted preview-copy">
+                GPU-accelerated view (WebGL). Pick a chunk index to inspect elevation samples from disk.
+              </p>
+            </div>
+            <wb-terrain-viewer [worldId]="vwId" [chunkCount]="tm.generation.chunkCount" />
+          }
+        }
+      </section>
+    }
+  }
+</section>

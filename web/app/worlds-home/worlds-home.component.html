@@ -1,0 +1,28 @@
+<section class="panel">
+  <h1>Worlds</h1>
+  <p class="toolbar">
+    <a routerLink="/" class="meta-link">Dashboard</a>
+    <a routerLink="/activity" class="meta-link">Live activity</a>
+  </p>
+  <p class="lede">
+    Procedural planets and patches for Unity baselines — simulation pipeline, file-backed storage, and scalable chunking come next.
+  </p>
+
+  @if (loadError(); as err) {
+    <p class="error" role="alert">{{ err }}</p>
+  }
+
+  @if (!loadError() && worlds().length === 0) {
+    <p class="empty">No worlds yet.</p>
+  }
+
+  <ul class="world-list">
+    @for (w of worlds(); track w.id) {
+      <li>
+        <a class="name world-link" [routerLink]="['/world', w.id]">{{ w.name }}</a>
+        <span class="meta">{{ w.shape }}</span>
+        <span class="meta">{{ w.createdUtc | date: 'medium' }}</span>
+      </li>
+    }
+  </ul>
+</section>

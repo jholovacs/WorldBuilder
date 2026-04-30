@@ -1,0 +1,26 @@
+<section class="terrain-view">
+  <header class="terrain-view__header">
+    <h1>Terrain preview</h1>
+    <p class="terrain-view__hint">
+      Drag to orbit · scroll to zoom · right-drag to pan — procedural heightmap from the API (
+      {{ terrainResolution }}×{{ terrainResolution }}, displacement {{ displacementHint() }}).
+    </p>
+    @if (metadata(); as meta) {
+      <dl class="terrain-view__meta">
+        <div><dt>Cell</dt><dd>{{ meta.cellSizeMeters | number : '1.2-4' }} m</dd></div>
+        <div><dt>Sea level</dt><dd>{{ meta.seaLevelMeters | number : '1.0-1' }} m</dd></div>
+      </dl>
+    }
+  </header>
+
+  @if (loadError(); as err) {
+    <p class="terrain-view__error" role="alert">{{ err }}</p>
+  }
+
+  <div class="terrain-view__viewport">
+    <div #canvasHost class="terrain-view__host"></div>
+    @if (loading()) {
+      <div class="terrain-view__loading" aria-busy="true">Loading terrain…</div>
+    }
+  </div>
+</section>

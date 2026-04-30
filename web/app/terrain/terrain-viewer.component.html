@@ -1,0 +1,30 @@
+<section class="terrain-viewer">
+  <p class="terrain-viewer__caption">
+    Terrain preview uses WebGL (your GPU via the browser). Drag to orbit · scroll to zoom.
+  </p>
+  <div class="terrain-viewer__toolbar">
+    <div class="field">
+      <span>Chunk index</span>
+      <input
+        type="number"
+        [min]="0"
+        [max]="maxChunkIndex()"
+        [ngModel]="chunkIndex()"
+        (ngModelChange)="onChunkIndexInput($event)"
+      />
+    </div>
+    <div class="nav">
+      <button type="button" [disabled]="chunkIndex() <= 0 || busy()" (click)="stepChunk(-1)">Prev</button>
+      <button type="button" [disabled]="chunkIndex() >= maxChunkIndex() || busy()" (click)="stepChunk(1)">
+        Next
+      </button>
+    </div>
+    @if (busy()) {
+      <span class="hint">Loading…</span>
+    }
+    @if (loadError(); as err) {
+      <p class="error" role="alert">{{ err }}</p>
+    }
+  </div>
+  <div #canvasHost class="host"></div>
+</section>

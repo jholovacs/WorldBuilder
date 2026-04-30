@@ -1,0 +1,74 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  /** Header + storage bar + margins — used to size full-height routes (e.g. terrain dashboard). */
+  --wb-chrome-stack: 140px;
+  --wb-bg: #f8fafc;
+  --wb-bg-soft: #f1f5f9;
+  --wb-text: #0f172a;
+  --wb-text-muted: #64748b;
+  --wb-text-subtle: #6b7280;
+  --wb-border: #e2e8f0;
+  --wb-border-strong: #cbd5e1;
+  --wb-surface: #ffffff;
+  --wb-surface-muted: #fafafa;
+  --wb-header-bg: rgba(255, 255, 255, 0.85);
+  --wb-shell-start: #f8fafc;
+  --wb-shell-end: #f1f5f9;
+  --wb-accent: #0f172a;
+  --wb-accent-inverse: #ffffff;
+  --wb-link: #0f172a;
+  --wb-error-bg: #fef2f2;
+  --wb-error-text: #991b1b;
+  --wb-error-border: #fecaca;
+  --wb-warn: #b45309;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --wb-bg: #0c1017;
+    --wb-bg-soft: #131923;
+    --wb-text: #e8edf4;
+    --wb-text-muted: #94a3b8;
+    --wb-text-subtle: #8899ac;
+    --wb-border: #334155;
+    --wb-border-strong: #475569;
+    --wb-surface: #1a2230;
+    --wb-surface-muted: #141c28;
+    --wb-header-bg: rgba(12, 16, 23, 0.92);
+    --wb-shell-start: #0c1017;
+    --wb-shell-end: #141c28;
+    --wb-accent: #38bdf8;
+    --wb-accent-inverse: #0a1628;
+    --wb-link: #7dd3fc;
+    --wb-error-bg: rgba(127, 29, 29, 0.35);
+    --wb-error-text: #fecaca;
+    --wb-error-border: rgba(248, 113, 113, 0.45);
+    --wb-warn: #fbbf24;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: var(--wb-text);
+  background: var(--wb-bg);
+}

@@ -1,0 +1,27 @@
+{
+  "mapName": "terra-nova",
+  "seed": 42,
+  "erosionParams": {
+    "cellSizeMeters": 9.765625,
+    "baseNoiseFrequency": 4,
+    "lacunarity": 2,
+    "persistence": 0.5,
+    "octaves": 6,
+    "thermalMaxStep": 0.035,
+    "thermalStrength": 0.35,
+    "thermalIterations": 24,
+    "hydraulicDropsPerPass": 100000,
+    "hydraulicPasses": 3,
+    "dropletMaxLifetime": 28,
+    "dropletInertia": 0.65,
+    "sedimentCapacityFactor": 4,
+    "depositRatio": 0.14,
+    "erodeRatio": 0.22,
+    "waterRetention": 0.975,
+    "dropletAcceleration": 18,
+    "maxElevationMeters": 2000,
+    "seaLevelMeters": 450
+  },
+  "savedUtc": "2026-04-29T21:24:18.1751865+00:00",
+  "resolution": 1024
+}

@@ -1,0 +1,475 @@
+<div class="world-dashboard">
+  <aside
+    #sidebarScroll
+    class="world-dashboard__sidebar"
+    (input)="schedulePersistSidebar()"
+    (change)="schedulePersistSidebar()"
+  >
+    <header class="world-dashboard__brand">
+      <h1>WorldBuilder</h1>
+      <p class="muted">Terrain dashboard</p>
+    </header>
+
+    <nav class="world-dashboard__nav">
+      <a routerLink="/worlds" class="nav-link">All worlds</a>
+      <a routerLink="/activity" class="nav-link">Activity</a>
+    </nav>
+
+    @if (busy()) {
+      <div class="world-dashboard__progress-slot">
+        @if (genPhase(); as phase) {
+          @if (phase.startsWith('Refining')) {
+            <p class="world-dashboard__progress-meta" aria-busy="true">{{ phase }}</p>
+          } @else {
+            <p class="world-dashboard__progress-meta" aria-busy="true">
+              {{ phase }} · {{ genIterationCur() }}/{{ genIterationTotal() }}
+            </p>
+            <progress class="world-dashboard__progress-bar" [value]="genProgress01()" max="1"></progress>
+          }
+        } @else {
+          <p class="world-dashboard__busy" aria-busy="true">Working…</p>
+        }
+      </div>
+    }
+
+    @if (error(); as err) {
+      <p class="world-dashboard__alert" role="alert">{{ err }}</p>
+    }
+
+    <section class="world-dashboard__section">
+      <h2>Plate / fault</h2>
+      <label class="field field--checkbox">
+        <input type="checkbox" name="tectonicsEnabled" [(ngModel)]="tectonicsEnabled" />
+        <span>Enable tectonic uplift</span>
+      </label>
+      @if (tectonicsEnabled) {
+        <p class="field-hint">
+          Runs once after procedural noise and before thermal erosion: uplift on one side of the fault, trench on the other, plus folding ripples near the fault trace. The fault follows a midpoint-displaced polyline across the map (normalized heights); optional noise warp bends sampling coords further.
+        </p>
+        <label class="field">
+          <span>Fault strike (° from +X)</span>
+          <input
+            type="number"
+            name="tectonicsFaultAngleDegrees"
+            [(ngModel)]="tectonicsFaultAngleDegrees"
+            step="1"
+            min="0"
+            max="180"
+          />
+        </label>
+        <label class="field field--checkbox">
+          <input type="checkbox" name="tectonicsInvertOverridingSide" [(ngModel)]="tectonicsInvertOverridingSide" />
+          <span>Flip overriding vs subducting side</span>
+        </label>
+        <label class="field">
+          <span>Fault path iterations (midpoint displacement)</span>
+          <input
+            type="number"
+            name="tectonicsFaultPathIterations"
+            [(ngModel)]="tectonicsFaultPathIterations"
+            step="1"
+            min="0"
+            max="14"
+          />
+        </label>
+        <label class="field">
+          <span>Fault path roughness (0–1)</span>
+          <input
+            type="number"
+            name="tectonicsFaultPathRoughness"
+            [(ngModel)]="tectonicsFaultPathRoughness"
+            step="0.02"
+            min="0"
+            max="1"
+          />
+        </label>
+        <label class="field">
+          <span>Fault warp noise scale</span>
+          <input
+            type="number"
+            name="tectonicsFaultWarpNoiseScale"
+            [(ngModel)]="tectonicsFaultWarpNoiseScale"
+            step="0.5"
+            min="0"
+            max="64"
+          />
+        </label>
+        <label class="field">
+          <span>Fault warp amplitude</span>
+          <input
+            type="number"
+            name="tectonicsFaultWarpAmplitude"
+            [(ngModel)]="tectonicsFaultWarpAmplitude"
+            step="0.002"
+            min="0"
+            max="0.2"
+          />
+        </label>
+        <label class="field">
+          <span>Uplift peak</span>
+          <input type="number" name="tectonicsUpliftPeak" [(ngModel)]="tectonicsUpliftPeak" step="0.005" min="0" max="0.5" />
+        </label>
+        <label class="field">
+          <span>Uplift falloff (σ)</span>
+          <input type="number" name="tectonicsUpliftFalloff" [(ngModel)]="tectonicsUpliftFalloff" step="0.01" min="0.02" max="1" />
+        </label>
+        <label class="field">
+          <span>Trench depth</span>
+          <input type="number" name="tectonicsTrenchDepth" [(ngModel)]="tectonicsTrenchDepth" step="0.005" min="0" max="0.5" />
+        </label>
+        <label class="field">
+          <span>Trench falloff (σ)</span>
+          <input type="number" name="tectonicsTrenchFalloff" [(ngModel)]="tectonicsTrenchFalloff" step="0.01" min="0.02" max="1" />
+        </label>
+        <label class="field">
+          <span>Folding amplitude</span>
+          <input type="number" name="tectonicsFoldingAmplitude" [(ngModel)]="tectonicsFoldingAmplitude" step="0.001" min="0" max="0.05" />
+        </label>
+        <label class="field">
+          <span>Folding cycles along strike</span>
+          <input type="number" name="tectonicsFoldingCycles" [(ngModel)]="tectonicsFoldingCycles" step="1" min="1" max="96" />
+        </label>
+        <label class="field">
+          <span>Folding envelope (σ)</span>
+          <input type="number" name="tectonicsFoldingEnvelope" [(ngModel)]="tectonicsFoldingEnvelope" step="0.01" min="0.02" max="0.5" />
+        </label>
+      }
+    </section>
+
+    <section class="world-dashboard__section">
+      <h2>Erosion</h2>
+      <label class="field">
+        <span>Seed</span>
+        <input type="number" name="seed" [(ngModel)]="seed" step="1" min="0" />
+      </label>
+      <label class="field">
+        <span>Octaves</span>
+        <input type="number" name="octaves" [(ngModel)]="octaves" step="1" min="1" max="16" />
+      </label>
+      <label class="field">
+        <span>Thermal iterations</span>
+        <input type="number" name="thermalIterations" [(ngModel)]="thermalIterations" step="1" min="1" max="256" />
+      </label>
+      <label class="field">
+        <span>Hydraulic passes</span>
+        <input type="number" name="hydraulicPasses" [(ngModel)]="hydraulicPasses" step="1" min="1" max="32" />
+      </label>
+      <label class="field">
+        <span>Hydraulic drops per pass</span>
+        <input
+          type="number"
+          name="hydraulicDropsPerPass"
+          [(ngModel)]="hydraulicDropsPerPass"
+          step="1000"
+          [min]="hydraulicDropsPerPassMin"
+          [max]="hydraulicDropsPerPassMax"
+        />
+      </label>
+      <label class="field">
+        <span>Max elevation (m)</span>
+        <input type="number" name="maxElevationMeters" [(ngModel)]="maxElevationMeters" step="1" min="1" />
+      </label>
+      <label class="field">
+        <span>Bilateral smoothing (0 = off)</span>
+        <input
+          type="number"
+          name="smoothingStrength"
+          [(ngModel)]="smoothingStrength"
+          step="0.05"
+          min="0"
+          max="4"
+        />
+      </label>
+      <label class="field">
+        <span>Smoothing radius (px)</span>
+        <input
+          type="number"
+          name="smoothingRadius"
+          [(ngModel)]="smoothingRadius"
+          step="0.25"
+          min="1"
+          max="16"
+        />
+      </label>
+      <p class="field-hint">
+        Edge-preserving bilateral: larger strength smooths flat areas; large height differences receive low weight — ridges stay sharper. Radius controls neighborhood size (~2×radius+1 per axis).
+      </p>
+    </section>
+
+    <section class="world-dashboard__section">
+      <h2>Glacier</h2>
+      <label class="field field--checkbox">
+        <input type="checkbox" name="glacierEnabled" [(ngModel)]="glacierEnabled" />
+        <span>Enable glacier erosion</span>
+      </label>
+      @if (glacierEnabled) {
+        <p class="field-hint">
+          Shallow-ice flow and U-shaped carving run after hydraulic erosion (uses normalized snow/melt lines vs terrain height).
+        </p>
+        <label class="field">
+          <span>Snow line (0–1)</span>
+          <input
+            type="number"
+            name="glacierSnowLineNormalized"
+            [(ngModel)]="glacierSnowLineNormalized"
+            step="0.01"
+            min="0"
+            max="1"
+          />
+        </label>
+        <label class="field">
+          <span>Melt line (0–1)</span>
+          <input
+            type="number"
+            name="glacierMeltLineNormalized"
+            [(ngModel)]="glacierMeltLineNormalized"
+            step="0.01"
+            min="0"
+            max="1"
+          />
+        </label>
+        <label class="field">
+          <span>Glacier iterations</span>
+          <input type="number" name="glacierIterations" [(ngModel)]="glacierIterations" step="1" min="1" max="128" />
+        </label>
+        <label class="field">
+          <span>Valley half-width (cells)</span>
+          <input
+            type="number"
+            name="glacierValleyHalfWidthCells"
+            [(ngModel)]="glacierValleyHalfWidthCells"
+            step="0.1"
+            min="0.75"
+            max="16"
+          />
+        </label>
+      }
+    </section>
+
+    <section class="world-dashboard__section">
+      <h2>Biomap (RGBA splat)</h2>
+      <label class="field field--checkbox">
+        <input type="checkbox" name="biomapEnabled" [(ngModel)]="biomapEnabled" />
+        <span>Export biome RGBA PNG (snow, veg near water, cliffs, dirt)</span>
+      </label>
+      @if (biomapEnabled) {
+        <p class="field-hint">
+          Built after meter scaling using height, hydraulic flow/deposit accumulation, sea level—plus lake sink overlay when glaciers are enabled. Included in engine ZIP as <code>biomap_rgba.png</code> at procedural grid size.
+        </p>
+        <label class="field">
+          <span>Snow line (m)</span>
+          <input type="number" name="biomapSnowLineMeters" [(ngModel)]="biomapSnowLineMeters" step="10" min="200" />
+        </label>
+        <label class="field">
+          <span>Snow blend band ± (m)</span>
+          <input type="number" name="biomapSnowSoftBandMeters" [(ngModel)]="biomapSnowSoftBandMeters" step="5" min="20" />
+        </label>
+        <label class="field">
+          <span>Snow edge jitter (m)</span>
+          <input type="number" name="biomapSnowJitterMeters" [(ngModel)]="biomapSnowJitterMeters" step="2" min="4" max="300" />
+        </label>
+        <label class="field">
+          <span>Moisture halo min reach (m)</span>
+          <input type="number" name="biomapMoistureReachMinMeters" [(ngModel)]="biomapMoistureReachMinMeters" step="5" min="15" />
+        </label>
+        <label class="field">
+          <span>Moisture halo max reach (m)</span>
+          <input type="number" name="biomapMoistureReachMaxMeters" [(ngModel)]="biomapMoistureReachMaxMeters" step="5" min="40" />
+        </label>
+        <label class="field">
+          <span>Blur spread σ (m)</span>
+          <input type="number" name="biomapMoistureBlurSigmaMeters" [(ngModel)]="biomapMoistureBlurSigmaMeters" step="5" min="25" />
+        </label>
+        <label class="field">
+          <span>Veg · moisture weight</span>
+          <input type="number" name="biomapVegetationMoistureWeight" [(ngModel)]="biomapVegetationMoistureWeight" step="0.05" min="0" max="3" />
+        </label>
+        <label class="field">
+          <span>Veg · flux weight</span>
+          <input type="number" name="biomapVegetationFlowWeight" [(ngModel)]="biomapVegetationFlowWeight" step="0.05" min="0" max="3" />
+        </label>
+        <label class="field">
+          <span>Veg · deposit weight</span>
+          <input type="number" name="biomapVegetationDepositWeight" [(ngModel)]="biomapVegetationDepositWeight" step="0.05" min="0" max="3" />
+        </label>
+        <label class="field">
+          <span>Rock / cliff onset (degrees)</span>
+          <input type="number" name="biomapCliffSlopeDegrees" [(ngModel)]="biomapCliffSlopeDegrees" step="1" min="15" max="70" />
+        </label>
+        <label class="field">
+          <span>Rock soft band (degrees)</span>
+          <input type="number" name="biomapCliffSlopeSoftDegrees" [(ngModel)]="biomapCliffSlopeSoftDegrees" step="0.25" min="0.25" max="15" />
+        </label>
+        <label class="field">
+          <span>Dirt · sediment cutoff (0–1)</span>
+          <input type="number" name="biomapDirtSedimentIntensity01" [(ngModel)]="biomapDirtSedimentIntensity01" step="0.02" min="0.05" max="0.95" />
+        </label>
+        <label class="field">
+          <span>Dirt blend (sed vs complement)</span>
+          <input
+            type="number"
+            name="biomapDirtSedimentVsComplementWeight"
+            [(ngModel)]="biomapDirtSedimentVsComplementWeight"
+            step="0.05"
+            min="0"
+            max="1"
+          />
+        </label>
+      }
+    </section>
+
+    <section class="world-dashboard__section">
+      <h2>Vegetation scatter mask</h2>
+      <label class="field field--checkbox">
+        <input type="checkbox" name="scatterVegEnabled" [(ngModel)]="scatterVegEnabled" />
+        <span>Export monochrome tree scatter PNG (ZIP)</span>
+      </label>
+      @if (scatterVegEnabled) {
+        <p class="field-hint">
+          High-contrast L8 mask: white where blurred moisture exceeds the gate, slope is below threshold, elevation is
+          below biomap snow line, with a two-octave noise multiplier so placement is not a grid. Moisture halo uses the same
+          reach/blur tuning as biome RGBA. ZIP entry <code>vegetation_scatter.png</code>.
+        </p>
+        <label class="field">
+          <span>Wet-mask threshold (0–1)</span>
+          <input
+            type="number"
+            name="scatterMoistureThreshold01"
+            [(ngModel)]="scatterMoistureThreshold01"
+            step="0.01"
+            min="0.08"
+            max="0.92"
+          />
+        </label>
+        <label class="field">
+          <span>Max slope (degrees)</span>
+          <input
+            type="number"
+            name="scatterMaxSlopeDegrees"
+            [(ngModel)]="scatterMaxSlopeDegrees"
+            step="0.5"
+            min="5"
+            max="55"
+          />
+        </label>
+        <label class="field">
+          <span>Scatter noise detail (spatial scale)</span>
+          <input type="number" name="scatterNoiseScale" [(ngModel)]="scatterNoiseScale" step="1" min="4" max="512" />
+        </label>
+        <label class="field">
+          <span>Noise multiplier min (0–1)</span>
+          <input
+            type="number"
+            name="scatterNoiseMultiplierMin01"
+            [(ngModel)]="scatterNoiseMultiplierMin01"
+            step="0.02"
+            min="0"
+            max="0.98"
+          />
+        </label>
+        <label class="field">
+          <span>Noise multiplier max (0–1)</span>
+          <input
+            type="number"
+            name="scatterNoiseMultiplierMax01"
+            [(ngModel)]="scatterNoiseMultiplierMax01"
+            step="0.02"
+            min="0.02"
+            max="1"
+          />
+        </label>
+        <label class="field">
+          <span>Binary cutoff</span>
+          <input type="number" name="scatterBinaryCutoff01" [(ngModel)]="scatterBinaryCutoff01" step="0.01" min="0.08" max="0.92" />
+        </label>
+      }
+    </section>
+
+    <section class="world-dashboard__section">
+      <h2>Maps</h2>
+      <div class="btn-row">
+        <button type="button" class="primary" [disabled]="busy()" (click)="generateNew()">Generate new</button>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="secondary" [disabled]="busy() || !hasTerrain()" (click)="refineErosion()">
+          Refine erosion
+        </button>
+      </div>
+      <div class="btn-row">
+        <button
+          type="button"
+          class="secondary"
+          [disabled]="busy() || !hasTerrain()"
+          (click)="simulateShallowWaterFlow()"
+        >
+          Shallow-water flow map (GPU)
+        </button>
+      </div>
+      <label class="field">
+        <span>GPU biome snow line (m)</span>
+        <input
+          type="number"
+          name="gpuShallowSnowLineMeters"
+          [(ngModel)]="gpuShallowSnowLineMeters"
+          step="25"
+          min="200"
+          max="5200"
+        />
+      </label>
+      <p class="field-hint">
+        Shallow-water GPU also dispatches <code>CalculateBiomes</code> (SPIR-V): adjusts snow in the RGBA overlay from this value; uses current erosion / biomap softness on the wire.
+      </p>
+      <div class="btn-row">
+        <button
+          type="button"
+          class="secondary"
+          [disabled]="busy() || !engineExportZip()"
+          (click)="downloadEngineExportZip()"
+        >
+          Download engine bundle (ZIP)
+        </button>
+      </div>
+      <p class="field-hint">
+        Hydraulic erosion on the current heightmap, then optional post-hydro thermal relaxation (does not rerun the initial thermal pass — PNG already includes it).
+      </p>
+      <p class="field-hint">
+        <strong>Shallow-water flow map</strong> runs a two-pass Vulkan compute simulation on the PNG (terrain bed + simulated depth, friction-damped velocities), then <code>CalculateBiomes</code> (height + water depth + slope) for an RGBA biome preview on emissive. Integrated flow still drives roughness. Requires Vulkan + SPIR-V (<code>ShallowWaterFlux.spv</code>, <code>ShallowWaterUpdate.spv</code>, <code>CalculateBiomes.spv</code>) on the API host.
+      </p>
+      <p class="field-hint">
+        After <strong>Generate new</strong>, download a ZIP with a 1025×1025 Unity-style heightmap (16-bit PNG plus UInt16 little-endian RAW), RGBA splat masks, optional biome <code>biomap_rgba.png</code>, optional
+        <code>vegetation_scatter.png</code>,
+        metadata JSON,
+        and a simplified OBJ preview mesh. Refining or loading a saved map clears the cached bundle until you generate again.
+      </p>
+      <label class="field">
+        <span>Save as</span>
+        <input type="text" name="saveMapName" [(ngModel)]="saveMapName" placeholder="my-map-name" autocomplete="off" />
+      </label>
+      <div class="btn-row">
+        <button type="button" class="secondary" [disabled]="busy()" (click)="saveCurrent()">Save current</button>
+      </div>
+      <label class="field">
+        <span>Load saved</span>
+        <select name="savedMap" [(ngModel)]="selectedSavedMap" (ngModelChange)="onSavedMapSelected()">
+          <option value="">— Select map —</option>
+          @for (m of savedMaps(); track m.mapName) {
+            <option [value]="m.mapName">{{ m.mapName }}</option>
+          }
+        </select>
+      </label>
+    </section>
+  </aside>
+
+  <div class="world-dashboard__viewer">
+    <div #canvasHost class="world-dashboard__canvas"></div>
+    @if (!hasTerrain() && !busy()) {
+      <p class="world-dashboard__hint world-dashboard__hint--idle">
+        Set parameters below, then <strong>Generate new</strong> or pick a saved map.
+      </p>
+    }
+    <p class="world-dashboard__hint">
+      Drag to orbit · scroll to zoom · {{ terrainResolution }}×{{ terrainResolution }} height samples · plane 10&nbsp;000 × 10&nbsp;000 scene
+      units (displacement scale = max elevation in meters).
+    </p>
+  </div>
+</div>

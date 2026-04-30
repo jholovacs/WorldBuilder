@@ -1,0 +1,22 @@
+{
+  "id": "2f6abb8b-2964-44b4-b84d-7efb3191bb4f",
+  "name": "Terra",
+  "shape": "Sphere",
+  "seed": 17375860683868988616,
+  "totalSurfaceAreaSquareKilometers": 100,
+  "surfaceWaterCoveragePercent": 70,
+  "maxGroundElevationAboveSeaLevelMeters": 5000,
+  "minGroundDepthBelowSeaLevelMeters": 5000,
+  "medianGroundElevationAboveSeaLevelMeters": 650,
+  "groundResolutionSquareMeters": 1,
+  "estimatedSurfaceCellCount": 100000000,
+  "linearScaleVersusEarth": 0.00044277172164892037,
+  "referenceRadiusMeters": 2820.9479177387816,
+  "torusMajorRadiusMeters": null,
+  "torusMinorRadiusMeters": null,
+  "patchExtentXMeters": null,
+  "patchExtentZMeters": null,
+  "lastCompletedPhase": "BaseTopology",
+  "createdUtc": "2026-04-29T19:51:13.4804202+00:00",
+  "modifiedUtc": "2026-04-29T19:51:13.4804202+00:00"
+}

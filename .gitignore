@@ -1,0 +1,28 @@
+## Build outputs
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Dd]ist/
+artifacts/
+*.user
+*.suo
+
+## .NET
+project.lock.json
+project.fragment.lock.json
+
+## Tooling
+.vs/
+.idea/
+
+## OS
+Thumbs.db
+Desktop.ini
+
+## Node / Angular (monorepo root)
+web/node_modules/
+web/dist/
+
+## Local world data (optional — uncomment to ignore persisted worlds)
+# WorldBuilder.Api/App_Data/
